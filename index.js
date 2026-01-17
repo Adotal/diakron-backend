@@ -1,67 +1,48 @@
-// index.js
 import express from "express";
 import multer from "multer";
-import axios from "axios";
 import fs from "fs";
-import cors from "cors";
+import { Client } from "@gradio/client";
 
 const app = express();
-app.use(cors());
-
 const upload = multer({ dest: "uploads/" });
 
-const HF_TOKEN = process.env.HF_TOKEN;
-const HF_MODEL = process.env.HF_MODEL;
+// Conectar una sola vez al Space
+const client = await Client.connect("Adotal/TrashNet");
 
-const HF_URL = `https://api-inference.huggingface.co/models/${HF_MODEL}`;
-
-// --- ENDPOINT PRINCIPAL ---
 app.post("/analyze", upload.single("image"), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: "No image received" });
-  }
-
   try {
-    const imageBuffer = fs.readFileSync(req.file.path);
+    if (!req.file) {
+      return res.status(400).json({ error: "No image received" });
+    }
 
-    const hfResponse = await axios.post(
-      HF_URL,
-      imageBuffer,
-      {
-        headers: {
-          Authorization: `Bearer ${HF_TOKEN}`,
-          "Content-Type": "application/octet-stream"
-        },
-        timeout: 25000
-      }
-    );
+    const imageBlob = new Blob([
+      fs.readFileSync(req.file.path)
+    ]);
+
+    const result = await client.predict("/predict", {
+      img: imageBlob
+    });
 
     fs.unlinkSync(req.file.path);
 
-    // HuggingFace devuelve array ordenado por score
-    const prediction = hfResponse.data[0];
+    const prediction = result.data[0];
+
+    // Convertir a porcentaje y limpiar
+    const confidences = prediction.confidences.map(c => ({
+      label: c.label,
+      confidence: Number((c.confidence * 100).toFixed(2))
+    }));
 
     res.json({
       success: true,
-      label: prediction.label,
-      confidence: Number(prediction.score.toFixed(3))
+      predicted: prediction.label,
+      confidences
     });
 
   } catch (err) {
-    console.error("HF ERROR:", err.message);
-    res.status(500).json({
-      success: false,
-      error: "Inference failed"
-    });
+    console.error(err);
+    res.status(500).json({ success: false, error: "Prediction failed" });
   }
 });
 
-// --- HEALTH CHECK ---
-app.get("/", (_, res) => {
-  res.send("DIAKRON backend running");
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log("Server running on port", PORT);
-});
+app.listen(3000);
