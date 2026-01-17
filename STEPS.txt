@@ -1,0 +1,13 @@
+STEPS.txt
+
+// CREATE REPOSITORY AND RENDER ACCOUNT
+// CREATE WEB SERVICE > SELECT REPOSITORY
+// SELECT FREE PLAN
+// BUILD COMMAND: npm install
+// START COMMAND: node index.js
+
+// TEST LOCAL
+curl -X POST http://localhost:3000/analyze   -F "image=@test.jpg"
+
+// TEST ON RENDER.COM
+curl -X POST https://diakron-backend.onrender.com/analyze  -F "image=@test.jpg"
