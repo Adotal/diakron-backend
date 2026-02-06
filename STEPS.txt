@@ -11,3 +11,11 @@ curl -X POST http://localhost:3000/analyze -F "image=@test.jpg"
 
 // TEST ON RENDER.COM
 curl -X POST https://diakron-backend.onrender.com/analyze -F "image=@test.jpg"
+
+
+FOR RAW FILES:
+// LOCAL
+curl -X POST http://localhost:3000/analyze --header "Content-Type: image/jpeg"   --data-binary "@test.jpg"
+
+// RENDER.COM
+curl -X POST https://diakron-backend.onrender.com/analyze   --header "Content-Type: image/jpeg"   --data-binary "@test.jpg"
