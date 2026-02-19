@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Adotal/diakron-backend#readme",
   "dependencies": {
+    "@noble/ed25519": "^3.0.0",
     "axios": "^1.13.2",
     "cors": "^2.8.5",
     "express": "^5.2.1",
