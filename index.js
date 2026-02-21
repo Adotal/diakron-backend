@@ -71,9 +71,10 @@ app.post("/verify-qr", qrParser, (req, res) => {
     const data = req.body;
 
     // TESTING
-    console.log("Buffer: ", data);
+    // console.log("Buffer: ", data);
+    // console.log(`Received raw binary data of length: ${data.length} bytes`);
 
-    // 3. Early validation: Ensure we actually received data and it's long enough
+    // Ensure we actually received data and it's long enough
     // Ed25519 signatures are exactly 64 bytes.
     if (!data || !Buffer.isBuffer(data) || data.length < 64) {
       return res.status(400).json({
@@ -83,9 +84,7 @@ app.post("/verify-qr", qrParser, (req, res) => {
       });
     }
 
-    console.log(`Received raw binary data of length: ${data.length} bytes`);
-
-    // 4. Extract message and signature cleanly
+    // Extract message and signature cleanly
     const message = new Uint8Array(data.subarray(0, data.length - 64));
     const signature = new Uint8Array(data.subarray(data.length - 64));
 
@@ -105,6 +104,7 @@ app.post("/verify-qr", qrParser, (req, res) => {
       valid: true,
       points: points,
     });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ valid: false });
