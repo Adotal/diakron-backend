@@ -6,16 +6,23 @@ STEPS.txt
 // BUILD COMMAND: npm install
 // START COMMAND: node index.js
 
-// TEST LOCAL
-curl -X POST http://localhost:3000/analyze -F "image=@test.jpg"
 
-// TEST ON RENDER.COM
-curl -X POST https://diakron-backend.onrender.com/analyze -F "image=@test.jpg"
+// CLEAN INSTALLATION
+npm install
+npm install @noble/ed25519
+npm install @noble/hashes
 
-
-FOR RAW FILES:
+//------------------------------TEST IMAGES----------------------------------
 // LOCAL
-curl -X POST http://localhost:3000/analyze --header "Content-Type: image/jpeg"   --data-binary "@test.jpg"
+curl -X POST --header "Content-Type: image/jpeg" --data-binary "@test/test.jpg" http://localhost:3000/analyze
 
 // RENDER.COM
-curl -X POST https://diakron-backend.onrender.com/analyze   --header "Content-Type: image/jpeg"   --data-binary "@test.jpg"
+curl -X POST --header "Content-Type: image/jpeg" --data-binary "@test/test.jpg" https://diakron-backend.onrender.com/analyze
+
+
+//------------------------------TEST QR----------------------------------
+// LOCAL
+curl -X POST --header "Content-Type: application/octet-stream" --data-binary @test/qr_payload.bin http://localhost:3000/verify-qr
+
+// RENDER
+curl -X POST --header "Content-Type: application/octet-stream" --data-binary @test/qr_payload.bin https://diakron-backend.onrender.com/verify-qr
